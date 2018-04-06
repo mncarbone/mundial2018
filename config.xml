@@ -4,9 +4,8 @@
     id          = "com.mncarbone.mundial2018"
     versionCode = "20"
     version     = "2.0.0" >
-    <!-- versionCode is optional and Android only -->
-    <name>PhoneGap Example</name>
-    <description> An example for phonegap build docs. </description>
+    <name>Mundial 2018</name>
+    <description>Viví el mundial en TM</description>
     <author href="https://github.com/mncarbone" email="consultas@mncarbone.com.ar">
      MNC
     </author>
