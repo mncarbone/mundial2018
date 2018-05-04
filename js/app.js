@@ -1,5 +1,6 @@
 app = {
   URL_PARTIDOS: 'http://api.football-data.org/v1/competitions/467/fixtures',
+  URL_GRUPOS: 'http://api.football-data.org/v1/competitions/467/leagueTable',
   API_TOKEN: '593cdb411dfd49cf8e3f48337f1606a3',
   map: {
     flag: {
@@ -184,6 +185,9 @@ app = {
   getPartidos: function (response) {
     return response.fixtures;
   },
+  getGrupos: function (response) {
+    return response.standings;
+  },
   getFecha: function (unPartido) {
     return unPartido.date;
   },
@@ -208,7 +212,7 @@ app = {
     return (unPartido.result.goalsAwayTeam)? unPartido.result.goalsAwayTeam : '-';
   },
   getBandera: function(nombre){
-    return this.map.flag[nombre.toUpperCase()];;
+    return (nombre)? this.map.flag[nombre.toUpperCase()] : '';
   },
   getCodigo: function(nombre){
     return (nombre && nombre != 'TBD')? app.map.code[this.getBandera(nombre)] : '???';
@@ -222,15 +226,31 @@ app.actualizarDatos = function (){
     dataType: 'json',
     type: 'GET',
   }).done(function(response) {
-      app.cargarDatos(response);
+      app.cargarDatosPartidos(response);
+  });
+
+  $.ajax({
+    headers: { 'X-Auth-Token': this.API_TOKEN },
+    url: this.URL_GRUPOS,
+    dataType: 'json',
+    type: 'GET',
+  }).done(function(response) {
+      app.cargarDatosGrupos(response);
   });
 }
 
-app.cargarDatos = function(response){
+app.cargarDatosPartidos = function(response){
   var datosPartidos = this.getPartidos(response);
   this.torneo = new Torneo();
   this.torneo.cargarDatosPartidos(datosPartidos);
   this.mostrarPartidos();
+}
+
+app.cargarDatosGrupos = function(response){
+  var datosGrupos = this.getGrupos(response);
+  this.torneo = new Torneo();
+  this.torneo.cargarDatosGrupos(datosGrupos);
+  this.mostrarGrupos();
 }
 
 app.mostrarPartidos = function(){
@@ -279,15 +299,56 @@ app.partidoHTML = function(unPartido){
   return txt;
 }
 
+app.mostrarGrupos = function(){
+  $( "#lstgrupos" ).html('');
+  var grupos = this.torneo.getGrupos();
+  for(idGrupo in grupos) {
+      grupo = grupos[idGrupo];
+      this.mostrarGrupo(grupo)
+  };
+  $('#lstgrupos').trigger('create');
+  $('#lstgrupos').listview('refresh');
+}
+
+app.mostrarGrupo = function(unGrupo){
+  this.mostrarSeparadorGrupo(unGrupo.id);
+  for(idEquipo in unGrupo.equipos) {
+      equipo = unGrupo.equipos[idEquipo];
+      this.mostrarEquipo(equipo)
+  };
+}
+
+app.mostrarSeparadorGrupo = function(idGrupo){
+  $('#lstgrupos').append($('<li data-role="list-divider" >GRUPO '+idGrupo+'</li>'));
+}
+
+app.mostrarEquipo = function(unEquipo){
+  var txt = '<small>'+unEquipo.posicion+'</small>&nbsp;&nbsp;';
+  txt += this.equipoHTML(unEquipo);
+  txt += '<span class="ui-li-count">'+unEquipo.puntos+'</span>';
+  $('#lstgrupos').append($('<li><div>'+txt+'</div></li>'));
+}
+
+app.equipoHTML = function(unEquipo){
+  var txt = '';
+  txt += '<img src="img/blank.gif" class="flag flag-'+unEquipo.bandera+'"> ';
+  txt += unEquipo.codigo;
+  return txt;
+}
 //------------------
 
 Torneo = function() {
   this.idPartido = 0;
   this.partidos = {};
+  this.grupos = {};
 }
 
 Torneo.prototype.getPartidos = function(){
   return this.partidos;
+}
+
+Torneo.prototype.getGrupos = function(){
+  return this.grupos;
 }
 
 Torneo.prototype.getId = function(){
@@ -300,6 +361,31 @@ Torneo.prototype.cargarDatosPartidos = function(datosPartidos){
       datosPartido = datosPartidos[i];
       var partido = new Partido(this.getId(), datosPartido);
       this.partidos[partido.id] = partido;
+  }
+}
+
+
+Torneo.prototype.cargarDatosGrupos = function(datosGrupos){
+  for(idGrupo in datosGrupos){
+      datosGrupo = datosGrupos[idGrupo];
+      var grupo = new Grupo(idGrupo, datosGrupo);
+      this.grupos[grupo.id] = grupo;
+  }
+}
+
+Grupo = function(id, datosGrupo){
+  this.id = id;
+  this.equipos = {};
+  this.cargarEquipos(datosGrupo);
+}
+
+Grupo.prototype.cargarEquipos = function(datosGrupo){
+  for(posEquipo in datosGrupo){
+      datosEquipo = datosGrupo[posEquipo];
+      var equipo = new Equipo(datosEquipo.team);
+      equipo.posicion = 1 * posEquipo + 1;
+      equipo.puntos = datosEquipo.points;
+      this.equipos[posEquipo] = equipo;
   }
 }
 
