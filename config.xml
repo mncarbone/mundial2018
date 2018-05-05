@@ -9,4 +9,5 @@
     <author href="https://github.com/mncarbone" email="consultas@mncarbone.com.ar">
      MNC
     </author>
+    <access origin="*"></access>
 </widget>
