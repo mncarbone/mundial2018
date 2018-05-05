@@ -1,7 +1,8 @@
 app = {
-  URL_PARTIDOS_TEST: 'https://jsonblob.com/api/jsonBlob/56d529cf-500c-11e8-91fd-9bf4817e5e9d',
   URL_PARTIDOS: 'http://api.football-data.org/v1/competitions/467/fixtures',
+  URL_PARTIDOS_ALT: 'https://jsonblob.com/api/jsonBlob/56d529cf-500c-11e8-91fd-9bf4817e5e9d',
   URL_GRUPOS: 'http://api.football-data.org/v1/competitions/467/leagueTable',
+  URL_GRUPOS_ALT: 'https://jsonblob.com/api/jsonBlob/28cefd39-5011-11e8-91fd-cdcf5cb3d77a',
   API_HEADER: 'X-Auth-Token',
   API_TOKEN: '593cdb411dfd49cf8e3f48337f1606a3',
   map: {
@@ -184,6 +185,14 @@ app = {
         've': 'VEN'
     }
   },
+
+  getHeaders: function (response) {
+    var headers = {}
+    headers[this.API_HEADER] = this.API_TOKEN;
+    return headers;
+  },
+
+
   getPartidos: function (response) {
     return response.fixtures;
   },
@@ -227,48 +236,31 @@ app = {
   }
 }
 
-function ajax_get(url, header, callback) {
-  var oReq = new XMLHttpRequest();
-  oReq.onload = function (e) {
-      callback(e.target.response);
-  };
-  oReq.open('GET', url, true);
-  oReq.setRequestHeader(header.key, header.token);
-  oReq.responseType = 'json';
-  oReq.send();
+app.actualizarDatos = function (){
+  this.actualizarPartidos();
+  this.actualizarGrupos();
 }
 
-app.actualizarDatos = function (){
-  /*
+app.actualizarPartidos = function (){
   $.ajax({
-    headers: { 'X-Auth-Token': this.API_TOKEN },
+    headers: this.getHeaders(),
     url: this.URL_PARTIDOS,
     dataType: 'json',
     type: 'GET',
   }).done(function(response) {
       app.cargarDatosPartidos(response);
   });
+}
 
+app.actualizarGrupos = function (){
   $.ajax({
-    headers: { 'X-Auth-Token': this.API_TOKEN },
+    headers: this.getHeaders(),
     url: this.URL_GRUPOS,
     dataType: 'json',
     type: 'GET',
   }).done(function(response) {
       app.cargarDatosGrupos(response);
   });
-  */
-
-  ajax_get(this.URL_PARTIDOS_TEST, {key: this.API_HEADER, token:this.API_TOKEN}, function(response) {
-      app.cargarDatosPartidos(response);
-  })
-/*
-  ajax_get(this.URL_GRUPOS, {key: this.API_HEADER, token:this.API_TOKEN}, function(response) {
-      app.cargarDatosGrupos(response);
-  })
-*/
-  //app.cargarDatosPartidos(app.default.partidos);
-  //app.cargarDatosGrupos(app.default.grupos);
 }
 
 app.cargarDatosPartidos = function(response){
@@ -298,7 +290,7 @@ app.mostrarPartidos = function(){
       this.mostrarPartido(partido)
   };
   $('#lstpartidos').trigger('create');
-  $('#lstpartidos').listview('refresh');
+  $('#lstpartidos').listview().listview('refresh');
 }
 
 app.mostrarSeparadorFecha = function(unaFecha){
@@ -339,7 +331,7 @@ app.mostrarGrupos = function(){
       this.mostrarGrupo(grupo)
   };
   $('#lstgrupos').trigger('create');
-  $('#lstgrupos').listview('refresh');
+  $('#lstgrupos').listview().listview('refresh');
 }
 
 app.mostrarGrupo = function(unGrupo){
@@ -395,7 +387,6 @@ Torneo.prototype.cargarDatosPartidos = function(datosPartidos){
       this.partidos[partido.id] = partido;
   }
 }
-
 
 Torneo.prototype.cargarDatosGrupos = function(datosGrupos){
   for(idGrupo in datosGrupos){
