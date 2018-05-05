@@ -18,7 +18,7 @@
     $(function() {
       $( "[data-role='navbar']" ).navbar();
       $( "[data-role='footer']" ).toolbar();
-      $.mobile.defaultPageTransition = 'none'; //slide
+      $.mobile.defaultPageTransition = 'slide';
       $.mobile.defaultHomeScroll = 0;
       document.addEventListener("backbutton", function(e){
           if($.mobile.activePage.is('#partidos')){
@@ -29,6 +29,9 @@
               navigator.app.backHistory();
           }
       }, false);
+      $('#btn_refresh').click(function(e){
+        app.actualizarDatos();
+      });
       app.actualizarDatos()
     });
   </script>
@@ -38,7 +41,7 @@
 <!-- Partidos -->
   <div data-role="page" id="partidos">
     <div data-role="header" data-position="fixed">
-      <a id="btn_refresh" href="#partidos" onclick="update(true)" data-role="button"
+      <a id="btn_refresh" href="#partidos" data-role="button"
          class="ui-btn-left ui-alt-icon ui-nodisc-icon ui-btn ui-icon-refresh ui-btn-icon-notext ui-corner-all"></a>
       <h1>Mundial</h1>
       <a onclick="navigator.app.exitApp();" data-role="button"
