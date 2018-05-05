@@ -1,4 +1,5 @@
 app = {
+  URL_PARTIDOS_TEST: 'https://jsonblob.com/api/jsonBlob/56d529cf-500c-11e8-91fd-9bf4817e5e9d',
   URL_PARTIDOS: 'http://api.football-data.org/v1/competitions/467/fixtures',
   URL_GRUPOS: 'http://api.football-data.org/v1/competitions/467/leagueTable',
   API_HEADER: 'X-Auth-Token',
@@ -258,14 +259,14 @@ app.actualizarDatos = function (){
   });
   */
 
-  ajax_get(this.URL_PARTIDOS, {key: this.API_HEADER, token:this.API_TOKEN}, function(response) {
+  ajax_get(this.URL_PARTIDOS_TEST, {key: this.API_HEADER, token:this.API_TOKEN}, function(response) {
       app.cargarDatosPartidos(response);
   })
-
+/*
   ajax_get(this.URL_GRUPOS, {key: this.API_HEADER, token:this.API_TOKEN}, function(response) {
       app.cargarDatosGrupos(response);
   })
-
+*/
   //app.cargarDatosPartidos(app.default.partidos);
   //app.cargarDatosGrupos(app.default.grupos);
 }
