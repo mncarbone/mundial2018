@@ -1,6 +1,7 @@
 app = {
   URL_PARTIDOS: 'http://api.football-data.org/v1/competitions/467/fixtures',
   URL_GRUPOS: 'http://api.football-data.org/v1/competitions/467/leagueTable',
+  API_HEADER: 'X-Auth-Token',
   API_TOKEN: '593cdb411dfd49cf8e3f48337f1606a3',
   map: {
     flag: {
@@ -225,6 +226,17 @@ app = {
   }
 }
 
+function ajax_get(url, header, callback) {
+  var oReq = new XMLHttpRequest();
+  oReq.onload = function (e) {
+      callback(e.target.response);
+  };
+  oReq.open('GET', url, true);
+  oReq.setRequestHeader(header.key, header.token);
+  oReq.responseType = 'json';
+  oReq.send();
+}
+
 app.actualizarDatos = function (){
   /*
   $.ajax({
@@ -245,8 +257,17 @@ app.actualizarDatos = function (){
       app.cargarDatosGrupos(response);
   });
   */
-  app.cargarDatosPartidos(app.default.partidos);
-  app.cargarDatosGrupos(app.default.grupos);
+
+  ajax_get(this.URL_PARTIDOS, {key: this.API_HEADER, token:this.API_TOKEN}, function(response) {
+      app.cargarDatosPartidos(response);
+  })
+
+  ajax_get(this.URL_GRUPOS, {key: this.API_HEADER, token:this.API_TOKEN}, function(response) {
+      app.cargarDatosGrupos(response);
+  })
+
+  //app.cargarDatosPartidos(app.default.partidos);
+  //app.cargarDatosGrupos(app.default.grupos);
 }
 
 app.cargarDatosPartidos = function(response){
