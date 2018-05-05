@@ -338,7 +338,8 @@ app.mostrarGrupo = function(unGrupo){
 }
 
 app.mostrarSeparadorGrupo = function(idGrupo){
-  $('#lstgrupos').append($('<li data-role="list-divider" >GRUPO '+idGrupo+'</li>'));
+  var txtEncabezado = '<span class="ui-li-count" style="color:gray;"> Ptos. </span>';
+  $('#lstgrupos').append($('<li data-role="list-divider" >GRUPO '+idGrupo+txtEncabezado+'</li>'));
 }
 
 app.mostrarEquipo = function(unEquipo){
