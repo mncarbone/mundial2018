@@ -30,9 +30,13 @@
           }
       }, false);
       $('#btn_refresh').click(function(e){
+        $( "#lstpartidos" ).html('<p align="center"><img src="css/images/ajax-loader.gif" /></p>');
         app.actualizarDatos();
       });
-      app.actualizarDatos()
+      app.actualizarDatos();
+      setInterval(function(){
+        app.actualizarDatos();
+      }, 120000);
     });
   </script>
 </head>
