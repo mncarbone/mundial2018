@@ -201,9 +201,9 @@ app = {
   },
   getDia: function (unPartido) {
     var date = new Date(this.getFecha(unPartido));
-    //var weekday = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-    //var día = weekday[date.getDay()];
-    return ('0' + date.getDate()).slice(-2)+ '/' +('0' + (date.getMonth() + 1)).slice(-2);
+    var weekday = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+    var día = weekday[date.getDay()];
+    return "Día " +('0' + date.getDate()).slice(-2)+ '/' +('0' + (date.getMonth() + 1)).slice(-2);
   },
   getHora: function (unPartido) {
     var date = new Date(this.getFecha(unPartido));
