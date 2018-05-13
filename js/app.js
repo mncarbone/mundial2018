@@ -205,7 +205,10 @@ app = {
   },
   getHora: function (unPartido) {
     var date = new Date(this.getFecha(unPartido));
-    return ('0' + date.getHours()).slice(-2)+ ':' +('0' + date.getMinutes()).slice(-2);
+    var weekday = ["Domingo", "Lunes"
+, "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+    var día = weekday[date.getDay()];
+    return día + ' ' + ('0' + date.getHours()).slice(-2)+ ':' +('0' + date.getMinutes()).slice(-2);
   },
   getLocal: function (unPartido) {
     return unPartido.homeTeamName;
