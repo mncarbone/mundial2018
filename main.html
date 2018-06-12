@@ -16,6 +16,7 @@
   <script type="text/javascript" src="js/app.js"></script>
   <script type="text/javascript">
     $(function() {
+      app.torneo = new Torneo();
       $( "[data-role='navbar']" ).navbar();
       $( "[data-role='footer']" ).toolbar();
       $.mobile.defaultPageTransition = 'slide';
@@ -75,11 +76,10 @@
          class="ui-btn-left ui-alt-icon ui-nodisc-icon ui-btn ui-icon-carat-l ui-btn-icon-notext ui-corner-all"></a>
       <h1>Posiciones</h1>
     </div>
-    <ol id="lstposiciones" data-role="listview">
+    <ul id="lstposiciones" data-role="listview">
       <p align="center"><img src="css/images/ajax-loader.gif" /></p>
-    </ol>
+    </ul>
   </div>
-
 
 <!-- Apuestas -->
   <div data-role="page" id="apuestas">

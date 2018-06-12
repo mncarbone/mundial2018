@@ -1,8 +1,9 @@
-app = {
+  app = {
   URL_PARTIDOS: 'http://api.football-data.org/v1/competitions/467/fixtures',
   URL_PARTIDOS_ALT: 'https://jsonblob.com/api/jsonBlob/56d529cf-500c-11e8-91fd-9bf4817e5e9d',
   URL_GRUPOS: 'http://api.football-data.org/v1/competitions/467/leagueTable',
   URL_GRUPOS_ALT: 'https://jsonblob.com/api/jsonBlob/28cefd39-5011-11e8-91fd-cdcf5cb3d77a',
+  URL_APUESTAS: 'https://jsonblob.com/api/jsonBlob/1be165fb-6e77-11e8-b3c1-d94a81719b43',
   API_HEADER: 'X-Auth-Token',
   API_TOKEN: '593cdb411dfd49cf8e3f48337f1606a3',
   map: {
@@ -196,6 +197,12 @@ app = {
   getGrupos: function (response) {
     return response.standings;
   },
+  getUsuarios: function (response) {
+    return response.usuarios;
+  },
+  getIdPartido: function (datosApuesta) {
+    return (datosApuesta.id_partido == 33)? 33 : ((datosApuesta.id_partido == 34)? 32 : datosApuesta.id_partido - 1);
+  },
   getFecha: function (unPartido) {
     return unPartido.date;
   },
@@ -236,6 +243,7 @@ app = {
 app.actualizarDatos = function (){
   this.actualizarPartidos();
   this.actualizarGrupos();
+  this.actualizarPosiciones();
 }
 
 app.actualizarPartidos = function (){
@@ -260,18 +268,48 @@ app.actualizarGrupos = function (){
   });
 }
 
+app.actualizarPosiciones = function (){
+  $.ajax({
+    headers: this.getHeaders(),
+    url: this.URL_APUESTAS,
+    dataType: 'json',
+    type: 'GET',
+  }).done(function(response) {
+      app.cargarDatosUsuarios(response);
+  });
+}
+
 app.cargarDatosPartidos = function(response){
   var datosPartidos = this.getPartidos(response);
-  this.torneo = new Torneo();
   this.torneo.cargarDatosPartidos(datosPartidos);
   this.mostrarPartidos();
 }
 
 app.cargarDatosGrupos = function(response){
   var datosGrupos = this.getGrupos(response);
-  this.torneo = new Torneo();
   this.torneo.cargarDatosGrupos(datosGrupos);
   this.mostrarGrupos();
+}
+
+app.cargarDatosUsuarios = function(response){
+  var datosUsuarios = this.getUsuarios(response);
+  this.torneo.cargarDatosUsuarios(datosUsuarios);
+  this.mostrarPosiciones();
+}
+
+app.mostrarPosiciones = function(){
+  var pos = 0;
+  $( "#lstposiciones" ).html('');
+  var txtEncabezado = '<span class="ui-li-count" style="color:gray;"> Ptos. </span>';
+  $('#lstposiciones').append($('<li data-role="list-divider" >PARTICIPANTE '+txtEncabezado+'</li>'));
+  var usuarios = this.torneo.getUsuariosPorPuntos();
+  for(idUsuario in usuarios) {
+      pos++;
+      usuario = usuarios[idUsuario];
+      this.mostrarUsuario(pos, usuario);
+  };
+  $('#lstposiciones').trigger('create');
+  $('#lstposiciones').listview().listview('refresh');
 }
 
 app.mostrarPartidos = function(){
@@ -284,10 +322,17 @@ app.mostrarPartidos = function(){
           this.mostrarSeparadorFecha(partido.dia);
           ultimaFecha = partido.dia;
       }
-      this.mostrarPartido(partido)
+      this.mostrarPartido(partido);
   };
   $('#lstpartidos').trigger('create');
   $('#lstpartidos').listview().listview('refresh');
+}
+
+app.mostrarUsuario = function(pos, unUsuario){
+  var txt = '<small>'+ pos +'</small>&nbsp;&nbsp;';
+  txt += unUsuario.nombre;
+  txt += '<span class="ui-li-count">' + unUsuario.getPuntos() + '</span>';
+  $('#lstposiciones').append($('<li><div>' + txt + '</div></li>'));
 }
 
 app.mostrarSeparadorFecha = function(unaFecha){
@@ -363,6 +408,11 @@ Torneo = function() {
   this.idPartido = 0;
   this.partidos = {};
   this.grupos = {};
+  this.usuarios = {};
+}
+
+Torneo.prototype.getUsuariosPorPuntos = function(){
+  return this.usuarios;
 }
 
 Torneo.prototype.getPartidos = function(){
@@ -392,6 +442,43 @@ Torneo.prototype.cargarDatosGrupos = function(datosGrupos){
       var grupo = new Grupo(idGrupo, datosGrupo);
       this.grupos[grupo.id] = grupo;
   }
+}
+
+Torneo.prototype.cargarDatosUsuarios = function(datosUsuarios){
+  for(idUsuario in datosUsuarios){
+      datosUsuario = datosUsuarios[idUsuario];
+      var usuario = new Usuario(idUsuario, datosUsuario, this);
+      this.usuarios[usuario.id] = usuario;
+  }
+}
+
+Usuario = function(id, datosUsuario, torneo){
+  this.id = id;
+  this.nombre = datosUsuario.nombre;
+  this.torneo = torneo;
+  this.apuestas = {};
+  this.cargarDatosApuestas(datosUsuario.apuestas);
+}
+
+Usuario.prototype.cargarDatosApuestas = function(datosApuestas){
+  for(idApuesta in datosApuestas){
+      var datosApuesta = datosApuestas[idApuesta];
+      var idPartido = app.getIdPartido(datosApuesta);
+      var partido = this.torneo.partidos[idPartido];
+      var apuesta = new Apuesta(partido, datosApuesta);
+      this.apuestas[idPartido] = apuesta;
+  }
+}
+
+Usuario.prototype.getPuntos = function(){
+  return 0;
+}
+
+Apuesta = function(partido, datosApuesta){
+  this.partido = partido;
+  this.resultado = datosApuesta.resultado;
+  this.golesLocal = datosApuesta.goles_local;
+  this.golesVisitante = datosApuesta.goles_visitante;
 }
 
 Grupo = function(id, datosGrupo){
