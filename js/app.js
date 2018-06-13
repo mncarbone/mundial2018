@@ -1,4 +1,4 @@
-  app = {
+app = {
   URL_PARTIDOS: 'http://api.football-data.org/v1/competitions/467/fixtures',
   URL_PARTIDOS_ALT: 'https://jsonblob.com/api/jsonBlob/56d529cf-500c-11e8-91fd-9bf4817e5e9d',
   URL_GRUPOS: 'http://api.football-data.org/v1/competitions/467/leagueTable',
@@ -6,6 +6,8 @@
   URL_APUESTAS: 'https://jsonblob.com/api/jsonBlob/1be165fb-6e77-11e8-b3c1-d94a81719b43',
   API_HEADER: 'X-Auth-Token',
   API_TOKEN: '593cdb411dfd49cf8e3f48337f1606a3',
+  PUNTOS_POR_RESULTADO: 1,
+  PUNTOS_POR_GOLES: 2,
   map: {
     flag: {
       'ALEMANIA': 'de',
@@ -412,7 +414,11 @@ Torneo = function() {
 }
 
 Torneo.prototype.getUsuariosPorPuntos = function(){
-  return this.usuarios;
+  return this.getUsuarios().slice().sort(function(a, b){return b.getPuntos() - a.getPuntos()});
+}
+
+Torneo.prototype.getUsuarios = function(){
+  return Object.values(this.usuarios);
 }
 
 Torneo.prototype.getPartidos = function(){
@@ -470,8 +476,20 @@ Usuario.prototype.cargarDatosApuestas = function(datosApuestas){
   }
 }
 
+Usuario.prototype.getApuestas = function(){
+  return Object.values(this.apuestas);
+}
+
 Usuario.prototype.getPuntos = function(){
-  return 0;
+  return this.puntosPorApuestas().reduce(function(acum, val){
+    return acum + val;
+  });
+}
+
+Usuario.prototype.puntosPorApuestas = function(){
+  return this.getApuestas().map(function(apuesta) {
+    return apuesta.getPuntos();
+  });
 }
 
 Apuesta = function(partido, datosApuesta){
@@ -479,6 +497,22 @@ Apuesta = function(partido, datosApuesta){
   this.resultado = datosApuesta.resultado;
   this.golesLocal = datosApuesta.goles_local;
   this.golesVisitante = datosApuesta.goles_visitante;
+}
+
+Apuesta.prototype.getPuntos = function(){
+  return this.puntosPorResultado() + this.puntosPorGoles();
+}
+
+Apuesta.prototype.puntosPorResultado = function(){
+  return (this.resultado == this.partido.resultado())? app.PUNTOS_POR_RESULTADO : 0;
+}
+
+Apuesta.prototype.puntosPorGoles = function(){
+  return (this.aciertoGoles())? app.PUNTOS_POR_RESULTADO : 0;
+}
+
+Apuesta.prototype.aciertoGoles = function(){
+  return this.golesLocal == this.partido.golesLocal && this.golesVisitante == this.partido.golesVisitante;
 }
 
 Grupo = function(id, datosGrupo){
@@ -505,6 +539,12 @@ Partido = function(id, datosPartido){
   this.visitante = new Equipo(app.getVisitante(datosPartido));
   this.golesLocal = app.getGolesLocal(datosPartido);
   this.golesVisitante = app.getGolesVisitante(datosPartido);
+}
+
+Partido.prototype.resultado = function(){
+  return (this.golesLocal == '-' || this.golesVisitante == '-') ? '-' : (
+    (this.golesLocal > this.golesVisitante)? 'L' : ((this.golesVisitante > this.golesLocal)? 'V' : 'E')
+  );
 }
 
 Partido.prototype.cantApuestasPor = function(unResultado){
