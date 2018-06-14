@@ -242,10 +242,14 @@ app = {
   }
 }
 
-app.actualizarDatos = function (){
-  app.actualizarGrupos(function () {
-    app.actualizarPartidos(function () {
-      app.actualizarPosiciones();
+app.actualizarDatos = function(){
+  app.actualizarGrupos(function() {
+    app.actualizarPartidos(function() {
+      app.actualizarPosiciones(function() {
+          app.mostrarPartidos();
+          app.mostrarGrupos();
+          app.mostrarPosiciones();
+      });
     });
   });
 }
@@ -274,7 +278,7 @@ app.actualizarGrupos = function (alCargar){
   });
 }
 
-app.actualizarPosiciones = function (){
+app.actualizarPosiciones = function (alCargar){
   $.ajax({
     headers: this.getHeaders(),
     url: this.URL_APUESTAS,
@@ -282,25 +286,24 @@ app.actualizarPosiciones = function (){
     type: 'GET',
   }).done(function(response) {
       app.cargarDatosUsuarios(response);
+      alCargar();
   });
 }
 
 app.cargarDatosPartidos = function(response){
   var datosPartidos = this.getPartidos(response);
   this.torneo.cargarDatosPartidos(datosPartidos);
-  this.mostrarPartidos();
 }
 
 app.cargarDatosGrupos = function(response){
   var datosGrupos = this.getGrupos(response);
   this.torneo.cargarDatosGrupos(datosGrupos);
-  this.mostrarGrupos();
+
 }
 
 app.cargarDatosUsuarios = function(response){
   var datosUsuarios = this.getUsuarios(response);
   this.torneo.cargarDatosUsuarios(datosUsuarios);
-  this.mostrarPosiciones();
 }
 
 app.mostrarPosiciones = function(){
