@@ -55,6 +55,16 @@ Torneo.prototype.cargarDatosUsuarios = function(datosUsuarios){
   }
 }
 
+Torneo.prototype.cantApuestasPor = function(unPartido, unResultado){
+  return this.apuestasPor(unPartido, unResultado).length;
+}
+
+Torneo.prototype.apuestasPor = function(unPartido, unResultado){
+  return this.getUsuarios().filter(function (usuario) {
+    return usuario.apostoPor(unPartido, unResultado);
+  })
+}
+
 Usuario = function(id, datosUsuario, torneo){
   this.id = id;
   this.nombre = datosUsuario.nombre;
@@ -81,6 +91,10 @@ Usuario.prototype.getPuntos = function(){
   return this.puntosPorApuestas().reduce(function(acum, val){
     return acum + val;
   });
+}
+
+Usuario.prototype.apostoPor = function(unPartido, unResultado){
+  return unPartido.id in this.apuestas && this.apuestas[unPartido.id].resultado == unResultado;
 }
 
 Usuario.prototype.puntosPorApuestas = function(){
@@ -147,7 +161,7 @@ Partido.prototype.resultado = function(){
 }
 
 Partido.prototype.cantApuestasPor = function(unResultado){
-  return 0;
+  return this.torneo.cantApuestasPor(this, unResultado);
 }
 
 Partido.prototype.getBanderaLocal = function(){
