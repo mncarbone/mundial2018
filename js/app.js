@@ -8,6 +8,7 @@ app = {
   API_TOKEN: '593cdb411dfd49cf8e3f48337f1606a3',
   PUNTOS_POR_RESULTADO: 1,
   PUNTOS_POR_GOLES: 2,
+  apuestasFiltradas: false,
   map: {
     flag: {
       'ALEMANIA': 'de',
@@ -306,7 +307,20 @@ app.cargarDatosUsuarios = function(response){
   this.torneo.cargarDatosUsuarios(datosUsuarios);
 }
 
-app.mostrarPosiciones = function(){
+app.filtrarApostadores = function(resultadoNumerico, idPartido){
+  var partido = this.torneo.getPartido(idPartido);
+  var resultado = (resultadoNumerico > 0)? 'L' : ((resultadoNumerico < 0)? 'V' : 'E');
+  app.mostrarPosiciones(partido, resultado);
+}
+
+app.quitarFiltroApostadores = function(){
+  if(this.apuestasFiltradas){
+    this.mostrarPosiciones();
+  }
+}
+
+app.mostrarPosiciones = function(partido, resultado){
+  this.apuestasFiltradas = partido && resultado;
   var pos = 0;
   $( "#lstposiciones" ).html('');
   this.mostrarEncabezadoPosiciones();
@@ -314,7 +328,9 @@ app.mostrarPosiciones = function(){
   for(idUsuario in usuarios) {
       pos++;
       usuario = usuarios[idUsuario];
-      this.mostrarUsuario(pos, usuario);
+      if(!this.apuestasFiltradas || usuario.apostoPor(partido, resultado)){
+          this.mostrarUsuario(pos, usuario);
+      }
   };
   $('#lstposiciones').trigger('create');
   $('#lstposiciones').listview().listview('refresh');
@@ -359,9 +375,9 @@ app.mostrarPartido = function(unPartido){
   var tl = unPartido.cantApuestasPor('L');
   var te = unPartido.cantApuestasPor('E');
   var tv = unPartido.cantApuestasPor('V');
-  txtApuestas = '<a href="#posiciones" onclick="filtrarApostadores(1,'+unPartido.id+')">&nbsp;'+tl+'&nbsp;</a> | ';
-  txtApuestas+= '<a href="#posiciones" onclick="filtrarApostadores(0,'+unPartido.id+')">&nbsp;'+te+'&nbsp;</a> | ';
-  txtApuestas+= '<a href="#posiciones" onclick="filtrarApostadores(-1,'+unPartido.id+')">&nbsp;'+tv+'&nbsp;</a>';
+  txtApuestas = '<a href="#posiciones" onclick="app.filtrarApostadores(1,'+unPartido.id+')">&nbsp;'+tl+'&nbsp;</a> | ';
+  txtApuestas+= '<a href="#posiciones" onclick="app.filtrarApostadores(0,'+unPartido.id+')">&nbsp;'+te+'&nbsp;</a> | ';
+  txtApuestas+= '<a href="#posiciones" onclick="app.filtrarApostadores(-1,'+unPartido.id+')">&nbsp;'+tv+'&nbsp;</a>';
   txt += '<span class="ui-li-count">'+txtApuestas+'</span>';
   $('#lstpartidos').append($('<li><div>'+txt+'</div></li>'));
 }

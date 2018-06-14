@@ -18,6 +18,10 @@ Torneo.prototype.getPartidos = function(){
   return this.partidos;
 }
 
+Torneo.prototype.getPartido = function(idPartido){
+  return this.partidos[idPartido];
+}
+
 Torneo.prototype.getGrupos = function(){
   return this.grupos;
 }

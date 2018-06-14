@@ -35,6 +35,9 @@
         $( "#lstpartidos" ).html('<p align="center"><img src="css/images/ajax-loader.gif" /></p>');
         app.actualizarDatos();
       });
+      $('#posiciones').click(function(e){
+        app.quitarFiltroApostadores();
+      });
       app.actualizarDatos();
       setInterval(function(){
         app.actualizarDatos();
