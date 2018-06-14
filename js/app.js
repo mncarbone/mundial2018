@@ -225,10 +225,10 @@ app = {
     return unPartido.awayTeamName;
   },
   getGolesLocal: function (unPartido) {
-    return (unPartido.result.goalsHomeTeam)? unPartido.result.goalsHomeTeam : '-';
+    return (unPartido.result.goalsHomeTeam === null)? '-' : unPartido.result.goalsHomeTeam;
   },
   getGolesVisitante: function (unPartido) {
-    return (unPartido.result.goalsAwayTeam)? unPartido.result.goalsAwayTeam : '-';
+    return (unPartido.result.goalsAwayTeam === null)? '-' : unPartido.result.goalsAwayTeam;
   },
   getBandera: function(nombre){
     return (nombre)? this.map.flag[nombre.toUpperCase()] : '';
@@ -243,12 +243,14 @@ app = {
 }
 
 app.actualizarDatos = function (){
-  this.actualizarPartidos();
-  this.actualizarGrupos();
-  this.actualizarPosiciones();
+  app.actualizarGrupos(function () {
+    app.actualizarPartidos(function () {
+      app.actualizarPosiciones();
+    });
+  });
 }
 
-app.actualizarPartidos = function (){
+app.actualizarPartidos = function (alCargar){
   $.ajax({
     headers: this.getHeaders(),
     url: this.URL_PARTIDOS,
@@ -256,10 +258,11 @@ app.actualizarPartidos = function (){
     type: 'GET',
   }).done(function(response) {
       app.cargarDatosPartidos(response);
+      alCargar();
   });
 }
 
-app.actualizarGrupos = function (){
+app.actualizarGrupos = function (alCargar){
   $.ajax({
     headers: this.getHeaders(),
     url: this.URL_GRUPOS,
@@ -267,6 +270,7 @@ app.actualizarGrupos = function (){
     type: 'GET',
   }).done(function(response) {
       app.cargarDatosGrupos(response);
+      alCargar();
   });
 }
 
@@ -302,8 +306,7 @@ app.cargarDatosUsuarios = function(response){
 app.mostrarPosiciones = function(){
   var pos = 0;
   $( "#lstposiciones" ).html('');
-  var txtEncabezado = '<span class="ui-li-count" style="color:gray;"> Ptos. </span>';
-  $('#lstposiciones').append($('<li data-role="list-divider" >PARTICIPANTE '+txtEncabezado+'</li>'));
+  this.mostrarEncabezadoPosiciones();
   var usuarios = this.torneo.getUsuariosPorPuntos();
   for(idUsuario in usuarios) {
       pos++;
@@ -312,6 +315,18 @@ app.mostrarPosiciones = function(){
   };
   $('#lstposiciones').trigger('create');
   $('#lstposiciones').listview().listview('refresh');
+}
+
+app.mostrarEncabezadoPosiciones = function(){
+  var txtEncabezado = '<span class="ui-li-count" style="color:gray;"> Puntos</span>';
+  $('#lstposiciones').append($('<li data-role="list-divider" >PARTICIPANTE '+txtEncabezado+'</li>'));
+}
+
+app.mostrarUsuario = function(pos, unUsuario){
+  var txt = '<small>'+ pos +'</small>&nbsp;&nbsp;';
+  txt += unUsuario.nombre;
+  txt += '<span class="ui-li-count">' + unUsuario.getPuntos() + '</span>';
+  $('#lstposiciones').append($('<li><div>' + txt + '</div></li>'));
 }
 
 app.mostrarPartidos = function(){
@@ -328,13 +343,6 @@ app.mostrarPartidos = function(){
   };
   $('#lstpartidos').trigger('create');
   $('#lstpartidos').listview().listview('refresh');
-}
-
-app.mostrarUsuario = function(pos, unUsuario){
-  var txt = '<small>'+ pos +'</small>&nbsp;&nbsp;';
-  txt += unUsuario.nombre;
-  txt += '<span class="ui-li-count">' + unUsuario.getPuntos() + '</span>';
-  $('#lstposiciones').append($('<li><div>' + txt + '</div></li>'));
 }
 
 app.mostrarSeparadorFecha = function(unaFecha){
@@ -357,13 +365,13 @@ app.mostrarPartido = function(unPartido){
 
 app.partidoHTML = function(unPartido){
   var txt = '';
-  txt += '<img src="img/blank.gif" class="flag flag-'+unPartido.local.bandera+'"> ';
-  txt += unPartido.local.codigo;
-  txt += ' <big>' + unPartido.golesLocal + '</big> ';
+  txt += '<img src="img/blank.gif" class="flag flag-'+unPartido.getBanderaLocal()+'"> ';
+  txt += unPartido.getCodigoLocal();
+  txt += ' <big>' + unPartido.getGolesLocal() + '</big> ';
   txt += ' : ';
-  txt += ' <big>' + unPartido.golesVisitante + '</big> ';
-  txt += unPartido.visitante.codigo;
-  txt += ' <img src="img/blank.gif" class="flag flag-'+unPartido.visitante.bandera+'">';
+  txt += ' <big>' + unPartido.getGolesVisitante() + '</big> ';
+  txt += unPartido.getCodigoVisitante();
+  txt += ' <img src="img/blank.gif" class="flag flag-'+unPartido.getBanderaVisitante()+'">';
   return txt;
 }
 
@@ -387,14 +395,18 @@ app.mostrarGrupo = function(unGrupo){
 }
 
 app.mostrarSeparadorGrupo = function(idGrupo){
-  var txtEncabezado = '<span class="ui-li-count" style="color:gray;"> Ptos. </span>';
+  var txtEncabezado = '<span class="ui-li-count" style="color:gray;"> Puntos|GF|GC|Dif </span>';
   $('#lstgrupos').append($('<li data-role="list-divider" >GRUPO '+idGrupo+txtEncabezado+'</li>'));
 }
 
 app.mostrarEquipo = function(unEquipo){
   var txt = '<small>'+unEquipo.posicion+'</small>&nbsp;&nbsp;';
+  var datos = '<big>' + unEquipo.puntos + '</big> | ';
+  datos += unEquipo.golesAFavor + ' | ';
+  datos += unEquipo.golesEnContra + ' | ';
+  datos += unEquipo.diferenciaDeGol;
   txt += this.equipoHTML(unEquipo);
-  txt += '<span class="ui-li-count">'+unEquipo.puntos+'</span>';
+  txt += '<span class="ui-li-count">' + datos + '</span>';
   $('#lstgrupos').append($('<li><div>'+txt+'</div></li>'));
 }
 
@@ -409,6 +421,7 @@ app.equipoHTML = function(unEquipo){
 Torneo = function() {
   this.idPartido = 0;
   this.partidos = {};
+  this.equipos = {};
   this.grupos = {};
   this.usuarios = {};
 }
@@ -429,15 +442,11 @@ Torneo.prototype.getGrupos = function(){
   return this.grupos;
 }
 
-Torneo.prototype.getId = function(){
-  return this.idPartido++;
-}
-
 Torneo.prototype.cargarDatosPartidos = function(datosPartidos){
   var tot = datosPartidos.length;
   for(var i=0; i < tot; i++){
       datosPartido = datosPartidos[i];
-      var partido = new Partido(this.getId(), datosPartido);
+      var partido = new Partido(i, datosPartido, this);
       this.partidos[partido.id] = partido;
   }
 }
@@ -445,9 +454,17 @@ Torneo.prototype.cargarDatosPartidos = function(datosPartidos){
 Torneo.prototype.cargarDatosGrupos = function(datosGrupos){
   for(idGrupo in datosGrupos){
       datosGrupo = datosGrupos[idGrupo];
-      var grupo = new Grupo(idGrupo, datosGrupo);
+      var grupo = new Grupo(idGrupo, datosGrupo, this);
       this.grupos[grupo.id] = grupo;
   }
+}
+
+Torneo.prototype.setEquipo = function(unEquipo){
+  this.equipos[unEquipo.codigo] = unEquipo;
+}
+
+Torneo.prototype.getEquipo = function(nombreEquipo){
+  return this.equipos[app.getCodigo(nombreEquipo)];
 }
 
 Torneo.prototype.cargarDatosUsuarios = function(datosUsuarios){
@@ -508,15 +525,16 @@ Apuesta.prototype.puntosPorResultado = function(){
 }
 
 Apuesta.prototype.puntosPorGoles = function(){
-  return (this.aciertoGoles())? app.PUNTOS_POR_RESULTADO : 0;
+  return (this.aciertoGoles())? app.PUNTOS_POR_GOLES : 0;
 }
 
 Apuesta.prototype.aciertoGoles = function(){
   return this.golesLocal == this.partido.golesLocal && this.golesVisitante == this.partido.golesVisitante;
 }
 
-Grupo = function(id, datosGrupo){
+Grupo = function(id, datosGrupo, torneo){
   this.id = id;
+  this.torneo = torneo;
   this.equipos = {};
   this.cargarEquipos(datosGrupo);
 }
@@ -524,19 +542,20 @@ Grupo = function(id, datosGrupo){
 Grupo.prototype.cargarEquipos = function(datosGrupo){
   for(posEquipo in datosGrupo){
       datosEquipo = datosGrupo[posEquipo];
-      var equipo = new Equipo(datosEquipo.team);
+      var equipo = new Equipo(datosEquipo);
       equipo.posicion = 1 * posEquipo + 1;
-      equipo.puntos = datosEquipo.points;
       this.equipos[posEquipo] = equipo;
+      this.torneo.setEquipo(equipo);
   }
 }
 
-Partido = function(id, datosPartido){
+Partido = function(id, datosPartido, torneo){
   this.id = id;
+  this.torneo = torneo;
   this.dia = app.getDia(datosPartido);
   this.hora = app.getHora(datosPartido);
-  this.local = new Equipo(app.getLocal(datosPartido));
-  this.visitante = new Equipo(app.getVisitante(datosPartido));
+  this.local = this.torneo.getEquipo(app.getLocal(datosPartido));
+  this.visitante = this.torneo.getEquipo(app.getVisitante(datosPartido));
   this.golesLocal = app.getGolesLocal(datosPartido);
   this.golesVisitante = app.getGolesVisitante(datosPartido);
 }
@@ -551,7 +570,37 @@ Partido.prototype.cantApuestasPor = function(unResultado){
   return 0;
 }
 
-function Equipo(unNombre){
-  this.codigo = app.getCodigo(unNombre)
-  this.bandera = app.getBandera(unNombre);
+Partido.prototype.getBanderaLocal = function(){
+  return (this.local)? this.local.bandera : '';
+}
+
+Partido.prototype.getBanderaVisitante= function(){
+  return (this.visitante)? this.visitante.bandera : '';
+}
+
+Partido.prototype.getCodigoLocal = function(){
+  return (this.local)? this.local.codigo : '???';
+}
+
+Partido.prototype.getCodigoVisitante = function(){
+  return (this.visitante)? this.visitante.codigo : '???';
+}
+
+Partido.prototype.getGolesLocal = function(){
+  return (this.local)? this.golesLocal : '-';
+}
+
+Partido.prototype.getGolesVisitante = function(){
+  return (this.visitante)? this.golesVisitante : '-';
+}
+
+function Equipo(datosEquipo){
+  this.nombre = datosEquipo.team;
+  this.codigo = app.getCodigo(this.nombre)
+  this.bandera = app.getBandera(this.nombre);
+  this.puntos = datosEquipo.points;
+  this.partidosJugados = datosEquipo.playedGames;
+  this.golesAFavor = datosEquipo.goals;
+  this.golesEnContra = datosEquipo.goalsAgainst;
+  this.diferenciaDeGol = datosEquipo.goalDifference;
 }
