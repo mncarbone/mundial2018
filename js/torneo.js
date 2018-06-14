@@ -14,6 +14,10 @@ Torneo.prototype.getUsuarios = function(){
   return Object.values(this.usuarios);
 }
 
+Torneo.prototype.getUsuario = function(idUsuario){
+  return this.usuarios[idUsuario];
+}
+
 Torneo.prototype.getPartidos = function(){
   return this.partidos;
 }

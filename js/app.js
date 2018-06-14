@@ -319,6 +319,36 @@ app.quitarFiltroApostadores = function(){
   }
 }
 
+app.mostrarApuestasDeUsuario = function(idUsuario){
+  var usuario = this.torneo.getUsuario(idUsuario);
+  $( "#encabezado_apuestas" ).html('Apuestas de '+usuario.nombre);
+  $( "#lstapuestas" ).html('');
+  for(idApuesta in usuario.apuestas) {
+    var apuesta = usuario.apuestas[idApuesta];
+    this.mostrarApuesta(apuesta);
+  }
+  $('#lstapuestas').trigger('create');
+  $('#lstapuestas').listview().listview('refresh');
+}
+
+app.mostrarApuesta = function(unaApuesta){
+  var txt = this.apuestaHTML(unaApuesta);
+  $('#lstapuestas').append($('<li><div>'+txt+'</div></li>'));
+}
+
+app.apuestaHTML = function(unaApuesta){
+  var unPartido = unaApuesta.partido;
+  var txt = '';
+  txt += '<img src="img/blank.gif" class="flag flag-'+unPartido.getBanderaLocal()+'"> ';
+  txt += unPartido.getCodigoLocal();
+  txt += ' <big>' + unaApuesta.golesLocal + '</big> ';
+  txt += ' : ';
+  txt += ' <big>' + unaApuesta.golesVisitante + '</big> ';
+  txt += unPartido.getCodigoVisitante();
+  txt += ' <img src="img/blank.gif" class="flag flag-'+unPartido.getBanderaVisitante()+'">';
+  return txt;
+}
+
 app.mostrarPosiciones = function(partido, resultado){
   this.apuestasFiltradas = partido && resultado;
   var pos = 0;
@@ -343,9 +373,15 @@ app.mostrarEncabezadoPosiciones = function(){
 
 app.mostrarUsuario = function(pos, unUsuario){
   var txt = '<small>'+ pos +'</small>&nbsp;&nbsp;';
-  txt += unUsuario.nombre;
+  txt += this.usuarioHTML(unUsuario);
   txt += '<span class="ui-li-count">' + unUsuario.getPuntos() + '</span>';
   $('#lstposiciones').append($('<li><div>' + txt + '</div></li>'));
+}
+
+app.usuarioHTML = function(unUsuario){
+  var id = unUsuario.id;
+  var nombre = unUsuario.nombre;
+  return '<a href="#apuestas" onclick="app.mostrarApuestasDeUsuario('+ id +')">' + nombre + '</a>';
 }
 
 app.mostrarPartidos = function(){
