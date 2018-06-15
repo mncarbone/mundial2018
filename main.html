@@ -22,6 +22,7 @@
       $( "[data-role='footer']" ).toolbar();
       $.mobile.defaultPageTransition = 'slide';
       $.mobile.defaultHomeScroll = 0;
+
       document.addEventListener("backbutton", function(e){
           if($.mobile.activePage.is('#partidos')){
               e.preventDefault();
@@ -31,13 +32,38 @@
               navigator.app.backHistory();
           }
       }, false);
+
       $('#btn_refresh').click(function(e){
         $( "#lstpartidos" ).html('<p align="center"><img src="css/images/ajax-loader.gif" /></p>');
         app.actualizarDatos();
       });
+
       $('#posiciones').click(function(e){
         app.quitarFiltroApostadores();
       });
+
+      $(document).on('swipeleft', '#partidos, #grupos', function(event){
+        if(event.handled !== true){
+          var nextpage = $.mobile.activePage.next('[data-role="page"]');
+          if (nextpage.length > 0) {
+            $.mobile.changePage(nextpage, {transition: "slide", reverse: false}, true, true);
+          }
+          event.handled = true;
+        }
+        return false;
+      });
+
+      $(document).on('swiperight', '.ui-page', function(event){
+          if(event.handled !== true){
+              var prevpage = $(this).prev('[data-role="page"]');
+              if (prevpage.length > 0) {
+                  $.mobile.changePage(prevpage, {transition: "slide", reverse: true}, true, true);
+              }
+              event.handled = true;
+          }
+          return false;
+      });
+
       app.actualizarDatos();
       setInterval(function(){
         app.actualizarDatos();
