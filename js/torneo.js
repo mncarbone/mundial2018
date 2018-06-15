@@ -7,7 +7,14 @@ Torneo = function() {
 }
 
 Torneo.prototype.getUsuariosPorPuntos = function(){
-  return this.getUsuarios().slice().sort(function(a, b){return b.getPuntos() - a.getPuntos()});
+  return this.getUsuarios().slice().sort(function(a, b){
+    var dif = b.getPuntos() - a.getPuntos();
+    if(dif == 0){
+      if(a.nombre < b.nombre) return -1;
+      if(a.nombre > b.nombre) return 1;
+    }
+    return dif;
+  });
 }
 
 Torneo.prototype.getUsuarios = function(){
