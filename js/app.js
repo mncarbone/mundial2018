@@ -332,7 +332,9 @@ app.mostrarApuestasDeUsuario = function(idUsuario){
 }
 
 app.mostrarApuesta = function(unaApuesta){
-  var txt = this.apuestaHTML(unaApuesta);
+  var txt = '<center>';
+  txt += this.apuestaHTML(unaApuesta);
+  txt += '</center>';
   $('#lstapuestas').append($('<li><div>'+txt+'</div></li>'));
 }
 
