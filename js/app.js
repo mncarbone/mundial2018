@@ -321,14 +321,19 @@ app.quitarFiltroApostadores = function(){
 
 app.mostrarApuestasDeUsuario = function(idUsuario){
   var usuario = this.torneo.getUsuario(idUsuario);
-  $( "#encabezado_apuestas" ).html('Apuestas de '+usuario.nombre);
   $( "#lstapuestas" ).html('');
+  app.mostrarEncabezadoApuestas(usuario);
   for(idApuesta in usuario.apuestas) {
     var apuesta = usuario.apuestas[idApuesta];
     this.mostrarApuesta(apuesta);
   }
   $('#lstapuestas').trigger('create');
   $('#lstapuestas').listview().listview('refresh');
+}
+
+app.mostrarEncabezadoApuestas = function(usuario){
+  var txtEncabezado = 'APUESTAS DE ' + usuario.nombre.toUpperCase();
+  $('#lstapuestas').append($('<li data-role="list-divider" >'+txtEncabezado+'</li>'));
 }
 
 app.mostrarApuesta = function(unaApuesta){
@@ -369,8 +374,9 @@ app.mostrarPosiciones = function(partido, resultado){
 }
 
 app.mostrarEncabezadoPosiciones = function(){
-  var txtEncabezado = '<span class="ui-li-count" style="color:gray;"> Puntos</span>';
-  $('#lstposiciones').append($('<li data-role="list-divider" >PARTICIPANTE '+txtEncabezado+'</li>'));
+  var txtEncabezado = 'PARTICIPANTES';
+  txtEncabezado += '<span class="ui-li-count" style="color:gray;"> Puntos</span>';
+  $('#lstposiciones').append($('<li data-role="list-divider" >'+txtEncabezado+'</li>'));
 }
 
 app.mostrarUsuario = function(pos, unUsuario){
