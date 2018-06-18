@@ -172,6 +172,10 @@ Apuesta.prototype.aciertoResultado = function(){
   return this.resultado == this.partido.resultado();
 }
 
+Apuesta.prototype.noAcierto = function(){
+  return this.partido.finalizado() && this.resultado != this.partido.resultado();
+}
+
 Apuesta.prototype.puntosPorGoles = function(){
   return (this.aciertoGoles())? app.PUNTOS_POR_GOLES : 0;
 }

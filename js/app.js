@@ -348,6 +348,7 @@ app.mostrarApuesta = function(unaApuesta){
   var cls = '';
   cls = (unaApuesta.aciertoResultado())? ' class="acierto_resultado"' : cls;
   cls = (unaApuesta.aciertoGoles())? ' class="acierto_goles"' : cls;
+  cls = (unaApuesta.noAcierto())? ' class="no_acierto"' : cls;
   $('#lstapuestas').append($('<li'+cls+'><div>'+txt+'</div></li>'));
 }
 
@@ -474,7 +475,7 @@ app.mostrarGrupo = function(unGrupo){
 }
 
 app.mostrarSeparadorGrupo = function(idGrupo){
-  var txtEncabezado = '<span class="ui-li-count" style="color:gray;"> Puntos|GF|GC|Dif </span>';
+  var txtEncabezado = '<span class="ui-li-count" style="color:gray;"> Puntos | GF | GC | Dif </span>';
   $('#lstgrupos').append($('<li data-role="list-divider" >GRUPO '+idGrupo+txtEncabezado+'</li>'));
 }
 

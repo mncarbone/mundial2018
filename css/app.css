@@ -25,3 +25,7 @@
 .acierto_resultado {
   background-color: #EBF0FF !important;
 }
+
+.no_acierto {
+  background-color: #F5FCF9 !important;
+}
