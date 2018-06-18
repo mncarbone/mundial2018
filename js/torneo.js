@@ -80,6 +80,29 @@ Torneo.prototype.apuestasPor = function(unPartido, unResultado){
   })
 }
 
+Torneo.prototype.puntosPrimero = function(){
+  return this.getUsuariosPorPuntos()[0].getPuntos();
+}
+
+Torneo.prototype.puntosSegundo = function(){
+  var usuarios = this.getUsuariosPorPuntos();
+  var puntosPrimero = usuarios[0].getPuntos();
+  if(puntosPrimero > 0){
+    for(var i = 0; i < usuarios.length; i++){
+      var usuario = usuarios[i];
+      var puntos = usuario.getPuntos();
+      if(puntos != puntosPrimero){
+        return puntos;
+      }
+    }
+  }
+  return 0;
+}
+
+Torneo.prototype.puntosUltimo = function(){
+  return this.getUsuariosPorPuntos().slice(-1)[0].getPuntos();
+}
+
 Usuario = function(id, datosUsuario, torneo){
   this.id = id;
   this.nombre = datosUsuario.nombre;
@@ -118,6 +141,18 @@ Usuario.prototype.puntosPorApuestas = function(){
   });
 }
 
+Usuario.prototype.esPrimero = function(){
+  return this.getPuntos() > 0 && this.getPuntos() == this.torneo.puntosPrimero();
+}
+
+Usuario.prototype.esSegundo = function(){
+  return this.getPuntos() > 0 && this.getPuntos() == this.torneo.puntosSegundo();
+}
+
+Usuario.prototype.esUltimo = function(){
+  return  this.torneo.puntosPrimero() > 0 && this.getPuntos() == this.torneo.puntosUltimo();
+}
+
 Apuesta = function(partido, datosApuesta){
   this.partido = partido;
   this.resultado = datosApuesta.resultado;
@@ -130,7 +165,11 @@ Apuesta.prototype.getPuntos = function(){
 }
 
 Apuesta.prototype.puntosPorResultado = function(){
-  return (this.resultado == this.partido.resultado())? app.PUNTOS_POR_RESULTADO : 0;
+  return (this.aciertoResultado())? app.PUNTOS_POR_RESULTADO : 0;
+}
+
+Apuesta.prototype.aciertoResultado = function(){
+  return this.resultado == this.partido.resultado();
 }
 
 Apuesta.prototype.puntosPorGoles = function(){

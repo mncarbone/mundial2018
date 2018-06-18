@@ -345,7 +345,10 @@ app.mostrarApuesta = function(unaApuesta){
   txt += this.apuestaHTML(unaApuesta);
   txt += '</center>';
   txt += '<span class="ui-li-count">' + unaApuesta.getPuntos() + '</span>';
-  $('#lstapuestas').append($('<li><div>'+txt+'</div></li>'));
+  var cls = '';
+  cls = (unaApuesta.aciertoResultado())? ' class="acierto_resultado"' : cls;
+  cls = (unaApuesta.aciertoGoles())? ' class="acierto_goles"' : cls;
+  $('#lstapuestas').append($('<li'+cls+'><div>'+txt+'</div></li>'));
 }
 
 app.apuestaHTML = function(unaApuesta){
@@ -388,7 +391,11 @@ app.mostrarUsuario = function(pos, unUsuario){
   var txt = '<small>'+ pos +'</small>&nbsp;&nbsp;';
   txt += this.usuarioHTML(unUsuario);
   txt += '<span class="ui-li-count">' + unUsuario.getPuntos() + '</span>';
-  $('#lstposiciones').append($('<li><div>' + txt + '</div></li>'));
+  var cls = '';
+  cls = (unUsuario.esPrimero())? ' class="primero"' : cls;
+  cls = (unUsuario.esSegundo())? ' class="segundo"' : cls;
+  cls = (unUsuario.esUltimo())? ' class="ultimo"' : cls;
+  $('#lstposiciones').append($('<li'+cls+'><div>' + txt + '</div></li>'));
 }
 
 app.usuarioHTML = function(unUsuario){
