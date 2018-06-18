@@ -167,12 +167,21 @@ Partido = function(id, datosPartido, torneo){
   this.visitante = this.torneo.getEquipo(app.getVisitante(datosPartido));
   this.golesLocal = app.getGolesLocal(datosPartido);
   this.golesVisitante = app.getGolesVisitante(datosPartido);
+  this.estado = app.getEstado(datosPartido);
 }
 
 Partido.prototype.resultado = function(){
   return (this.golesLocal == '-' || this.golesVisitante == '-') ? '-' : (
     (this.golesLocal > this.golesVisitante)? 'L' : ((this.golesVisitante > this.golesLocal)? 'V' : 'E')
   );
+}
+
+Partido.prototype.iniciado = function(){
+  return this.estado == 'INICIADO';
+}
+
+Partido.prototype.finalizado = function(){
+  return this.estado == 'FINALIZADO';
 }
 
 Partido.prototype.cantApuestasPor = function(unResultado){

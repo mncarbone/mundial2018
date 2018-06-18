@@ -231,6 +231,9 @@ app = {
   getGolesVisitante: function (unPartido) {
     return (unPartido.result.goalsAwayTeam === null)? '-' : unPartido.result.goalsAwayTeam;
   },
+  getEstado: function(unPartido){
+    return (unPartido.status == 'FINISHED')? 'FINALIZADO' : ((unPartido.status == 'IN_PLAY')? 'INICIADO' : 'PENDIENTE');
+  },
   getBandera: function(nombre){
     return (nombre)? this.map.flag[nombre.toUpperCase()] : '';
   },
@@ -333,6 +336,7 @@ app.mostrarApuestasDeUsuario = function(idUsuario){
 
 app.mostrarEncabezadoApuestas = function(usuario){
   var txtEncabezado = 'APUESTAS DE ' + usuario.nombre.toUpperCase();
+  txtEncabezado += '<span class="ui-li-count" style="color:gray;"> Puntos</span>';
   $('#lstapuestas').append($('<li data-role="list-divider" >'+txtEncabezado+'</li>'));
 }
 
@@ -340,6 +344,7 @@ app.mostrarApuesta = function(unaApuesta){
   var txt = '<center>';
   txt += this.apuestaHTML(unaApuesta);
   txt += '</center>';
+  txt += '<span class="ui-li-count">' + unaApuesta.getPuntos() + '</span>';
   $('#lstapuestas').append($('<li><div>'+txt+'</div></li>'));
 }
 
@@ -423,7 +428,10 @@ app.mostrarPartido = function(unPartido){
   txtApuestas+= '<a href="#posiciones" onclick="app.filtrarApostadores(0,'+unPartido.id+')">&nbsp;'+te+'&nbsp;</a> | ';
   txtApuestas+= '<a href="#posiciones" onclick="app.filtrarApostadores(-1,'+unPartido.id+')">&nbsp;'+tv+'&nbsp;</a>';
   txt += '<span class="ui-li-count">'+txtApuestas+'</span>';
-  $('#lstpartidos').append($('<li><div>'+txt+'</div></li>'));
+  var cls = '';
+  cls = (unPartido.iniciado())? ' class="iniciado"' : cls;
+  cls = (unPartido.finalizado())? ' class="finalizado"' : cls;
+  $('#lstpartidos').append($('<li'+cls+'><div>'+txt+'</div></li>'));
 }
 
 app.partidoHTML = function(unPartido){
