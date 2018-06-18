@@ -38,9 +38,9 @@
         app.actualizarDatos();
       });
 
-      $('#btn_posiciones').click(function(e){
+      on_click_btn_posiciones = function(e){
         app.quitarFiltroApostadores();
-      });
+      };
 
       $(document).on('swipeleft', '#partidos, #grupos', function(event){
         if(event.handled !== true){
@@ -127,9 +127,9 @@
   <div data-role="footer" data-position="fixed" data-theme="a">
       <div data-role="navbar">
         <ul>
-          <li><a id="#btn_partidos" href="#partidos" data-icon="home">Partidos</a></li>
-          <li><a id="#btn_grupos" href="#grupos" data-icon="calendar">Grupos</a></li>
-          <li><a id="#btn_posiciones" href="#posiciones" data-icon="bullets">Posiciones</a></li>
+          <li><a id="#btn_partidos" href="#partidos" data-icon="home" class="ui-btn-active ui-state-persist">Partidos</a></li>
+          <li><a id="#btn_grupos" href="#grupos" data-icon="calendar" class="ui-state-persist">Grupos</a></li>
+          <li><a id="#btn_posiciones" href="#posiciones" data-icon="bullets" class="ui-state-persist" onclick="on_click_btn_posiciones()">Posiciones</a></li>
         </ul>
       </div>
   </div>
