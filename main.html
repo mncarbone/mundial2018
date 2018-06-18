@@ -38,7 +38,7 @@
         app.actualizarDatos();
       });
 
-      $('#posiciones').click(function(e){
+      $('#btn_posiciones').click(function(e){
         app.quitarFiltroApostadores();
       });
 
@@ -127,9 +127,9 @@
   <div data-role="footer" data-position="fixed" data-theme="a">
       <div data-role="navbar">
         <ul>
-          <li><a href="#partidos" data-icon="home">Partidos</a></li>
-          <li><a href="#grupos" data-icon="calendar">Grupos</a></li>
-          <li><a href="#posiciones" data-icon="bullets">Posiciones</a></li>
+          <li><a id="#btn_partidos" href="#partidos" data-icon="home">Partidos</a></li>
+          <li><a id="#btn_grupos" href="#grupos" data-icon="calendar">Grupos</a></li>
+          <li><a id="#btn_posiciones" href="#posiciones" data-icon="bullets">Posiciones</a></li>
         </ul>
       </div>
   </div>
