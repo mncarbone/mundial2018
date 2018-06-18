@@ -39,6 +39,10 @@
         app.actualizarDatos();
       });
 
+      $('#partidos').bind('pageshow', function(e){
+        $(document).scrollTop($("#lstpartidos .finalizado").last().position().top);
+      });
+
       $('div[data-role="navbar"] a[href="#posiciones"]').click(function (e) {
         app.quitarFiltroApostadores();
       });
