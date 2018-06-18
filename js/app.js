@@ -411,6 +411,7 @@ app.mostrarPartidos = function(){
   };
   $('#lstpartidos').trigger('create');
   $('#lstpartidos').listview().listview('refresh');
+  $(document).scrollTop($("#lstpartidos .finalizado").last().position().top);
 }
 
 app.mostrarSeparadorFecha = function(unaFecha){
