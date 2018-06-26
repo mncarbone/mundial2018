@@ -353,9 +353,10 @@ app.mostrarEncabezadoApuestas = function(usuario){
 
 app.mostrarApuesta = function(unaApuesta){
   var cls = '';
-  cls = (unaApuesta.aciertoResultado())? ' class="acierto_resultado"' : cls;
-  cls = (unaApuesta.aciertoGoles())? ' class="acierto_goles"' : cls;
-  cls = (unaApuesta.noAcierto())? ' class="no_acierto"' : cls;
+  var clsFinalizado = unaApuesta.partido.finalizado()? ' finalizado' : '';
+  cls = (unaApuesta.aciertoResultado())? ' class="acierto_resultado'+clsFinalizado+'"' : cls;
+  cls = (unaApuesta.aciertoGoles())? ' class="acierto_goles'+clsFinalizado+'"' : cls;
+  cls = (unaApuesta.noAcierto())? ' class="no_acierto'+clsFinalizado+'"' : cls;
 
   $('#lstapuestas').append(`
     <li{{clase}}>
