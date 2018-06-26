@@ -1,31 +1,31 @@
-.finalizado {
+#partidos .finalizado {
   background-color: #F5FCF9 !important;
 }
 
-.iniciado {
+#partidos .iniciado {
   background-color: #FFFFEB !important;
 }
 
-.primero {
+#posiciones .primero {
   background-color: #FFFFEB !important;
 }
 
-.segundo {
+#posiciones .segundo {
   background-color: #EBF0FF !important;
 }
 
-.ultimo {
+#posiciones .ultimo {
   background-color: #FFEBEB !important;
 }
 
-.acierto_goles {
+#apuestas .acierto_goles {
   background-color: #FFFFEB !important;
 }
 
-.acierto_resultado {
+#apuestas .acierto_resultado {
   background-color: #EBF0FF !important;
 }
 
-.no_acierto {
+#apuestas .no_acierto {
   background-color: #F5FCF9 !important;
 }
