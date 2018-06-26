@@ -315,10 +315,9 @@ app.cargarDatosUsuarios = function(response){
   this.torneo.cargarDatosUsuarios(datosUsuarios);
 }
 
-app.filtrarApostadores = function(resultadoNumerico, idPartido){
+app.filtrarApostadores = function(resultado, idPartido){
   var partido = this.torneo.getPartido(idPartido);
-  var resultado = (resultadoNumerico > 0)? 'L' : ((resultadoNumerico < 0)? 'V' : 'E');
-  app.mostrarPosiciones(partido, resultado);
+  this.mostrarPosiciones(partido, resultado);
 }
 
 app.quitarFiltroApostadores = function(){
@@ -346,7 +345,7 @@ app.mostrarEncabezadoApuestas = function(usuario){
       <span class="ui-li-count" style="color:gray;"> Puntos</span>
     </li>
     `.template({
-      nombre: usuario.nombre.toUpperCase()
+      nombre: usuario.nombre.replace('&rsquo;', '`').toUpperCase()
     })
   );
 }
@@ -392,17 +391,40 @@ app.mostrarPosiciones = function(partido, resultado){
   this.apuestasFiltradas = partido && resultado;
   var pos = 0;
   $( "#lstposiciones" ).html('');
-  this.mostrarEncabezadoPosiciones();
+  if(this.apuestasFiltradas)
+    this.mostrarEncabezadoPosicionesFiltradas(partido, resultado);
+  else
+    this.mostrarEncabezadoPosiciones();
   var usuarios = this.torneo.getUsuariosPorPuntos();
   for(idUsuario in usuarios) {
       pos++;
       usuario = usuarios[idUsuario];
       if(!this.apuestasFiltradas || usuario.apostoPor(partido, resultado)){
-          this.mostrarUsuario(pos, usuario);
+          this.mostrarUsuario(pos, usuario, partido);
       }
   };
   $('#lstposiciones').trigger('create');
   $('#lstposiciones').listview().listview('refresh');
+}
+
+app.mostrarEncabezadoPosicionesFiltradas = function(partido, resultado){
+  $('#lstposiciones').append(`
+    <li data-role="list-divider" >
+      APOSTARON que {{resultado}}&nbsp;
+      <span>
+        <img src="img/blank.gif" class="flag flag-{{banderaLocal}}">
+        {{local}} vs. {{visitante}}
+        <img src="img/blank.gif" class="flag flag-{{banderaVisitante}}">
+      </span>
+      <span class="ui-li-count" style="color:gray;"> Resultado</span>
+    </li>
+  `.template({
+      resultado: (resultado == 'L')? 'GANA' : ((resultado == 'V')? 'PIERDE' : 'EMPATAN'),
+      local: partido.getCodigoLocal(),
+      banderaLocal: partido.getBanderaLocal(),
+      visitante: partido.getCodigoVisitante(),
+      banderaVisitante: partido.getBanderaVisitante()
+  }));
 }
 
 app.mostrarEncabezadoPosiciones = function(){
@@ -413,7 +435,7 @@ app.mostrarEncabezadoPosiciones = function(){
   `);
 }
 
-app.mostrarUsuario = function(pos, unUsuario){
+app.mostrarUsuario = function(pos, unUsuario, partido){
   var cls = '';
   cls = (unUsuario.esPrimero())? ' class="primero"' : cls;
   cls = (unUsuario.esSegundo())? ' class="segundo"' : cls;
@@ -429,7 +451,7 @@ app.mostrarUsuario = function(pos, unUsuario){
   `.template({
       posicion: pos,
       usuario: this.usuarioHTML(unUsuario),
-      puntos: unUsuario.getPuntos(),
+      puntos: (partido)? unUsuario.apuestas[partido.id].golesLocal + ' - ' + unUsuario.apuestas[partido.id].golesVisitante : unUsuario.getPuntos(),
       clase:cls
     })
   );
@@ -485,14 +507,15 @@ app.mostrarPartido = function(unPartido){
         <small>{{hora}}</small>&nbsp;&nbsp;
         {{partido}}
         <span class="ui-li-count">
-          <a href="#posiciones" onclick="app.filtrarApostadores(1, {{id}})">&nbsp;{{tl}}&nbsp;</a> |
-          <a href="#posiciones" onclick="app.filtrarApostadores(1, {{id}})">&nbsp;{{te}}&nbsp;</a> |
-          <a href="#posiciones" onclick="app.filtrarApostadores(1, {{id}})">&nbsp;{{tv}}&nbsp;</a>
+          <a href="#posiciones" onclick="app.filtrarApostadores('L', {{id}})">&nbsp;{{tl}}&nbsp;</a> |
+          <a href="#posiciones" onclick="app.filtrarApostadores('E', {{id}})">&nbsp;{{te}}&nbsp;</a> |
+          <a href="#posiciones" onclick="app.filtrarApostadores('V', {{id}})">&nbsp;{{tv}}&nbsp;</a>
         </span>
       </div>
     </li>
   `.template({
       hora: unPartido.hora,
+      id: unPartido.id,
       partido: this.partidoHTML(unPartido),
       tl: unPartido.cantApuestasPor('L'),
       te: unPartido.cantApuestasPor('E'),
