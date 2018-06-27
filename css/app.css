@@ -29,3 +29,7 @@
 #apuestas .no_acierto {
   background-color: #F5FCF9 !important;
 }
+
+.ui-input-search{
+  margin: 0.5em;
+}
