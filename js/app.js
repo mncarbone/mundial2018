@@ -1,10 +1,10 @@
-String.prototype.template = function (data) {
-    return this.replace(
-      /{{(\w*)}}/g,
-      function( m, key ){
-        return data.hasOwnProperty( key ) ? data[ key ] : "";
-      }
-    );
+$.fn.template = function(data) {
+  return $(this).html().replace(
+    /{{(\w*)}}/g,
+    function( m, key ){
+      return data.hasOwnProperty( key ) ? data[ key ] : "";
+    }
+  );
 }
 
 app = {
@@ -307,7 +307,6 @@ app.cargarDatosPartidos = function(response){
 app.cargarDatosGrupos = function(response){
   var datosGrupos = this.getGrupos(response);
   this.torneo.cargarDatosGrupos(datosGrupos);
-
 }
 
 app.cargarDatosUsuarios = function(response){
@@ -339,15 +338,9 @@ app.mostrarApuestasDeUsuario = function(idUsuario){
 }
 
 app.mostrarEncabezadoApuestas = function(usuario){
-  $('#lstapuestas').append(`
-    <li data-role="list-divider">
-      APUESTAS DE {{nombre}}
-      <span class="ui-li-count" style="color:gray;"> Puntos</span>
-    </li>
-    `.template({
-      nombre: usuario.nombre.replace('&rsquo;', '`').toUpperCase()
-    })
-  );
+  $('#lstapuestas').append($('#apuestas template.separador').template({
+    nombre: usuario.nombre.replace('&rsquo;', '`').toUpperCase()
+  }));
 }
 
 app.mostrarApuesta = function(unaApuesta){
@@ -356,35 +349,17 @@ app.mostrarApuesta = function(unaApuesta){
   cls = (unaApuesta.aciertoResultado())? ' class="acierto_resultado'+clsFinalizado+'"' : cls;
   cls = (unaApuesta.aciertoGoles())? ' class="acierto_goles'+clsFinalizado+'"' : cls;
   cls = (unaApuesta.noAcierto())? ' class="no_acierto'+clsFinalizado+'"' : cls;
-
-  $('#lstapuestas').append(`
-    <li{{clase}}>
-      <div>
-        <center>{{apuesta}}</center>
-        <span class="ui-li-count">{{puntos}}</span>
-      </div>
-    </li>
-    `.template({
-        apuesta: this.apuestaHTML(unaApuesta),
+  $('#lstapuestas').append($('#apuestas template.item').template({
+        banderaLocal: unaApuesta.partido.getBanderaLocal(),
+        local: unaApuesta.partido.getCodigoLocal(),
+        golesLocal: unaApuesta.golesLocal,
+        banderaVisitante: unaApuesta.partido.getBanderaVisitante(),
+        visitante: unaApuesta.partido.getCodigoVisitante(),
+        golesVisitante: unaApuesta.golesVisitante,
         puntos: unaApuesta.getPuntos(),
         clase: cls
     })
   );
-}
-
-app.apuestaHTML = function(unaApuesta){
-  return `
-    <img src="img/blank.gif" class="flag flag-{{banderaLocal}}">
-    {{local}} <big>{{golesLocal}}</big> : <big>{{golesVisitante}}</big> {{visitante}}
-    <img src="img/blank.gif" class="flag flag-{{banderaVisitante}}">
-  `.template({
-      banderaLocal: unaApuesta.partido.getBanderaLocal(),
-      local: unaApuesta.partido.getCodigoLocal(),
-      golesLocal: unaApuesta.golesLocal,
-      banderaVisitante: unaApuesta.partido.getBanderaVisitante(),
-      visitante: unaApuesta.partido.getCodigoVisitante(),
-      golesVisitante: unaApuesta.golesVisitante
-  })
 }
 
 app.mostrarPosiciones = function(partido, resultado){
@@ -408,17 +383,7 @@ app.mostrarPosiciones = function(partido, resultado){
 }
 
 app.mostrarEncabezadoPosicionesFiltradas = function(partido, resultado){
-  $('#lstposiciones').append(`
-    <li data-role="list-divider" >
-      APOSTARON que {{resultado}}&nbsp;
-      <span>
-        <img src="img/blank.gif" class="flag flag-{{banderaLocal}}">
-        {{local}} vs. {{visitante}}
-        <img src="img/blank.gif" class="flag flag-{{banderaVisitante}}">
-      </span>
-      <span class="ui-li-count" style="color:gray;"> Resultado</span>
-    </li>
-  `.template({
+  $('#lstposiciones').append($('#posiciones template.encabezado').template({
       resultado: (resultado == 'L')? 'GANA' : ((resultado == 'V')? 'PIERDE' : 'EMPATAN'),
       local: partido.getCodigoLocal(),
       banderaLocal: partido.getBanderaLocal(),
@@ -428,11 +393,7 @@ app.mostrarEncabezadoPosicionesFiltradas = function(partido, resultado){
 }
 
 app.mostrarEncabezadoPosiciones = function(){
-  $('#lstposiciones').append(`
-    <li data-role="list-divider" >
-      PARTICIPANTES <span class="ui-li-count" style="color:gray;"> Puntos</span>
-    </li>
-  `);
+  $('#lstposiciones').append($('#posiciones template.separador').html());
 }
 
 app.mostrarUsuario = function(pos, unUsuario, partido){
@@ -440,32 +401,14 @@ app.mostrarUsuario = function(pos, unUsuario, partido){
   cls = (unUsuario.esPrimero())? ' class="primero"' : cls;
   cls = (unUsuario.esSegundo())? ' class="segundo"' : cls;
   cls = (unUsuario.esUltimo())? ' class="ultimo"' : cls;
-  $('#lstposiciones').append(`
-    <li{{clase}}>
-      <div>
-        <small>{{posicion}}</small>&nbsp;&nbsp;
-        {{usuario}}
-        <span class="ui-li-count">{{puntos}}</span>
-      </div>
-    </li>
-  `.template({
+  $('#lstposiciones').append($('#posiciones template.item').template({
       posicion: pos,
-      usuario: this.usuarioHTML(unUsuario),
+      id: unUsuario.id,
+      nombre: unUsuario.nombre,
       puntos: (partido)? unUsuario.apuestas[partido.id].golesLocal + ' - ' + unUsuario.apuestas[partido.id].golesVisitante : unUsuario.getPuntos(),
       clase:cls
     })
   );
-}
-
-app.usuarioHTML = function(unUsuario){
-  return `
-    <a href="#apuestas" onclick="app.mostrarApuestasDeUsuario({{id}})">
-      {{nombre}}
-    </a>
-  `.template({
-      id: unUsuario.id,
-      nombre: unUsuario.nombre
-  });
 }
 
 app.mostrarPartidos = function(){
@@ -486,12 +429,7 @@ app.mostrarPartidos = function(){
 }
 
 app.mostrarSeparadorFecha = function(unaFecha){
-  $('#lstpartidos').append(`
-    <li data-role="list-divider">
-      {{fecha}}
-      <span class="ui-li-count" style="color:gray;"> L | E | V </span>
-    </li>
-  `.template({
+  $('#lstpartidos').append($('#partidos template.separador').template({
       fecha: unaFecha
     })
   );
@@ -501,45 +439,21 @@ app.mostrarPartido = function(unPartido){
   var cls = '';
   cls = (unPartido.iniciado())? ' class="iniciado"' : cls;
   cls = (unPartido.finalizado())? ' class="finalizado"' : cls;
-  $('#lstpartidos').append(`
-    <li{{clase}}>
-      <div>
-        <small>{{hora}}</small>&nbsp;&nbsp;
-        {{partido}}
-        <span class="ui-li-count">
-          <a href="#posiciones" onclick="app.filtrarApostadores('L', {{id}})">&nbsp;{{tl}}&nbsp;</a> |
-          <a href="#posiciones" onclick="app.filtrarApostadores('E', {{id}})">&nbsp;{{te}}&nbsp;</a> |
-          <a href="#posiciones" onclick="app.filtrarApostadores('V', {{id}})">&nbsp;{{tv}}&nbsp;</a>
-        </span>
-      </div>
-    </li>
-  `.template({
+  $('#lstpartidos').append($('#partidos template.item').template({
       hora: unPartido.hora,
       id: unPartido.id,
-      partido: this.partidoHTML(unPartido),
       tl: unPartido.cantApuestasPor('L'),
       te: unPartido.cantApuestasPor('E'),
       tv: unPartido.cantApuestasPor('V'),
-      clase: cls
-    })
-  );
-}
-
-app.partidoHTML = function(unPartido){
-  return `
-    <img src="img/blank.gif" class="flag flag-{{banderaLocal}}">
-    {{local}}
-    <big>{{golesLocal}}</big> : <big>{{golesVisitante}}</big>
-    {{visitante}}
-    <img src="img/blank.gif" class="flag flag-{{banderaVisitante}}">
-  `.template({
+      clase: cls,
       banderaLocal: unPartido.getBanderaLocal(),
       local: unPartido.getCodigoLocal(),
       golesLocal: unPartido.getGolesLocal(),
       banderaVisitante: unPartido.getBanderaVisitante(),
       visitante: unPartido.getCodigoVisitante(),
       golesVisitante: unPartido.getGolesVisitante()
-  });
+    })
+  );
 }
 
 app.mostrarGrupos = function(){
@@ -562,42 +476,19 @@ app.mostrarGrupo = function(unGrupo){
 }
 
 app.mostrarSeparadorGrupo = function(idGrupo){
-  $('#lstgrupos').append(`
-      <li data-role="list-divider">
-        GRUPO {{grupo}}
-        <span class="ui-li-count" style="color:gray;"> Puntos | GF | GC | Dif </span>
-      </li>
-    `.template({
+  $('#lstgrupos').append($('#grupos template.separador').template({
       grupo: idGrupo
-    }));
+  }));
 }
 
 app.mostrarEquipo = function(unEquipo){
-  $('#lstgrupos').append(`
-    <li>
-      <div>
-        <small> {{posicion}} </small>&nbsp;&nbsp;
-        {{equipo}}
-        <span class="ui-li-count">
-          <big> {{puntos}} </big> | {{golesAFavor}} | {{golesEnContra}} | {{diferenciaDeGol}}
-        </span>
-      </div>
-    </li>
-  `.template({
+  $('#lstgrupos').append($('#grupos template.item').template({
     posicion: unEquipo.posicion,
-    equipo: this.equipoHTML(unEquipo),
+    equipo: unEquipo.codigo,
+    bandera: unEquipo.bandera,
     puntos: unEquipo.puntos,
     golesAFavor: unEquipo.golesAFavor,
     golesEnContra: unEquipo.golesEnContra,
     diferenciaDeGol: unEquipo.diferenciaDeGol
   }));
-}
-
-app.equipoHTML = function(unEquipo){
-  return `
-    <img src="img/blank.gif" class="flag flag-{{bandera}}"> {{equipo}}
-  `.template({
-      equipo: unEquipo.codigo,
-      bandera: unEquipo.bandera
-  });
 }

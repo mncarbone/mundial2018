@@ -94,6 +94,29 @@
     <ul id="lstpartidos" data-role="listview">
       <p align="center"><img src="css/images/ajax-loader.gif" /></p>
     </ul>
+    <template class="separador">
+      <li data-role="list-divider">
+        {{fecha}}
+        <span class="ui-li-count" style="color:gray;"> L | E | V </span>
+      </li>
+    </template>
+    <template class="item">
+      <li{{clase}}>
+        <div>
+          <small>{{hora}}</small>&nbsp;&nbsp;
+          <img src="img/blank.gif" class="flag flag-{{banderaLocal}}">
+          {{local}}
+          <big>{{golesLocal}}</big> : <big>{{golesVisitante}}</big>
+          {{visitante}}
+          <img src="img/blank.gif" class="flag flag-{{banderaVisitante}}">
+          <span class="ui-li-count">
+            <a href="#posiciones" onclick="app.filtrarApostadores('L', {{id}})">&nbsp;{{tl}}&nbsp;</a> |
+            <a href="#posiciones" onclick="app.filtrarApostadores('E', {{id}})">&nbsp;{{te}}&nbsp;</a> |
+            <a href="#posiciones" onclick="app.filtrarApostadores('V', {{id}})">&nbsp;{{tv}}&nbsp;</a>
+          </span>
+        </div>
+      </li>
+    </template>
   </div>
 
 <!-- Grupos -->
@@ -106,6 +129,23 @@
     <ul id="lstgrupos" data-role="listview">
       <p align="center"><img src="css/images/ajax-loader.gif" /></p>
     </ul>
+    <template class="separador">
+      <li data-role="list-divider">
+        GRUPO {{grupo}}
+        <span class="ui-li-count" style="color:gray;"> Puntos | GF | GC | Dif </span>
+      </li>
+    </template>
+    <template class="item">
+      <li>
+        <div>
+          <small> {{posicion}} </small>&nbsp;&nbsp;
+          <img src="img/blank.gif" class="flag flag-{{bandera}}"> {{equipo}}
+          <span class="ui-li-count">
+            <big> {{puntos}} </big> | {{golesAFavor}} | {{golesEnContra}} | {{diferenciaDeGol}}
+          </span>
+        </div>
+      </li>
+    </template>
   </div>
 
 <!-- Posiciones -->
@@ -118,6 +158,33 @@
     <ul id="lstposiciones" data-role="listview">
       <p align="center"><img src="css/images/ajax-loader.gif" /></p>
     </ul>
+    <template class="encabezado">
+      <li data-role="list-divider" >
+        DICE que {{resultado}}&nbsp;
+        <span>
+          <img src="img/blank.gif" class="flag flag-{{banderaLocal}}">
+          {{local}} vs. {{visitante}}
+          <img src="img/blank.gif" class="flag flag-{{banderaVisitante}}">
+        </span>
+        <span class="ui-li-count" style="color:gray;"> Pronóstico</span>
+      </li>
+    </template>
+    <template class="separador">
+      <li data-role="list-divider" >
+        PARTICIPANTES <span class="ui-li-count" style="color:gray;"> Puntos</span>
+      </li>
+    </template>
+    <template class="item">
+      <li{{clase}}>
+        <div>
+          <small>{{posicion}}</small>&nbsp;&nbsp;
+          <a href="#apuestas" onclick="app.mostrarApuestasDeUsuario({{id}})">
+            {{nombre}}
+          </a>
+          <span class="ui-li-count">{{puntos}}</span>
+        </div>
+      </li>
+    </template>
   </div>
 
 <!-- Apuestas -->
@@ -130,6 +197,22 @@
     <ul id="lstapuestas" data-role="listview">
       <p align="center"><img src="css/images/ajax-loader.gif" /></p>
     </ul>
+    <template class="separador">
+      <li data-role="list-divider">
+        APUESTAS DE {{nombre}}
+        <span class="ui-li-count" style="color:gray;"> Puntos</span>
+      </li>
+    </template>
+    <template class="item">
+      <li{{clase}}>
+        <center>
+          <img src="img/blank.gif" class="flag flag-{{banderaLocal}}">
+          {{local}} <big>{{golesLocal}}</big> : <big>{{golesVisitante}}</big> {{visitante}}
+          <img src="img/blank.gif" class="flag flag-{{banderaVisitante}}">
+        </center>
+        <span class="ui-li-count">{{puntos}}</span>
+      </li>
+    </template>
   </div>
 
 <!-- Footer -->
