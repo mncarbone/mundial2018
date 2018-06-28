@@ -265,3 +265,7 @@ function Equipo(datosEquipo){
   this.golesEnContra = datosEquipo.goalsAgainst;
   this.diferenciaDeGol = datosEquipo.goalDifference;
 }
+
+Equipo.prototype.clasificado = function(){
+  return this.partidosJugados == 3 && this.posicion <= 2;
+}

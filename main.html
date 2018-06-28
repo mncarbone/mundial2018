@@ -91,7 +91,7 @@
       <a onclick="navigator.app.exitApp();" data-role="button"
          class="ui-btn-right ui-alt-icon ui-nodisc-icon ui-btn ui-icon-delete ui-btn-icon-notext ui-corner-all"></a>
     </div>
-    <ul id="lstpartidos" data-role="listview" data-filter="true">
+    <ul id="lstpartidos" data-role="listview" data-filter="true" data-filter-placeholder="Buscar equipo...">
       <p align="center"><img src="css/images/ajax-loader.gif" /></p>
     </ul>
     <template class="separador">
@@ -101,7 +101,7 @@
       </li>
     </template>
     <template class="item">
-      <li{{clase}}>
+      <li {{clase}}>
         <div>
           <small>{{hora}}</small>&nbsp;&nbsp;
           <img src="img/blank.gif" class="flag flag-{{banderaLocal}}">
@@ -136,7 +136,7 @@
       </li>
     </template>
     <template class="item">
-      <li>
+      <li {{clase}}>
         <div>
           <small> {{posicion}} </small>&nbsp;&nbsp;
           <img src="img/blank.gif" class="flag flag-{{bandera}}"> {{equipo}}
@@ -160,13 +160,13 @@
     </ul>
     <template class="encabezado">
       <li data-role="list-divider" >
-        DICE que {{resultado}}&nbsp;
+        {{resultado}}&nbsp;
         <span>
           <img src="img/blank.gif" class="flag flag-{{banderaLocal}}">
           {{local}} vs. {{visitante}}
           <img src="img/blank.gif" class="flag flag-{{banderaVisitante}}">
         </span>
-        <span class="ui-li-count" style="color:gray;"> Pronóstico</span>
+        <span class="ui-li-count" style="color:gray;"> Pronóstico | Puntos </span>
       </li>
     </template>
     <template class="separador">
@@ -175,7 +175,7 @@
       </li>
     </template>
     <template class="item">
-      <li{{clase}}>
+      <li {{clase}}>
         <div>
           <small>{{posicion}}</small>&nbsp;&nbsp;
           <a href="#apuestas" onclick="app.mostrarApuestasDeUsuario({{id}})">
@@ -204,7 +204,7 @@
       </li>
     </template>
     <template class="item">
-      <li{{clase}}>
+      <li {{clase}}>
         <center>
           <img src="img/blank.gif" class="flag flag-{{banderaLocal}}">
           {{local}} <big>{{golesLocal}}</big> : <big>{{golesVisitante}}</big> {{visitante}}

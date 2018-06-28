@@ -405,7 +405,7 @@ app.mostrarUsuario = function(pos, unUsuario, partido){
       posicion: pos,
       id: unUsuario.id,
       nombre: unUsuario.nombre,
-      puntos: (partido)? unUsuario.apuestas[partido.id].golesLocal + ' - ' + unUsuario.apuestas[partido.id].golesVisitante : unUsuario.getPuntos(),
+      puntos: ((partido)? unUsuario.apuestas[partido.id].golesLocal + ' - ' + unUsuario.apuestas[partido.id].golesVisitante + ' | ' : '') + unUsuario.getPuntos(),
       clase:cls
     })
   );
@@ -482,7 +482,10 @@ app.mostrarSeparadorGrupo = function(idGrupo){
 }
 
 app.mostrarEquipo = function(unEquipo){
+  var cls = '';
+  cls = (unEquipo.clasificado())? ' class="clasificado"' : cls;
   $('#lstgrupos').append($('#grupos template.item').template({
+    clase: cls,
     posicion: unEquipo.posicion,
     equipo: unEquipo.codigo,
     bandera: unEquipo.bandera,
