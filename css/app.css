@@ -10,6 +10,11 @@
   background-color: #FFFFEB !important;
 }
 
+#grupos .dato{
+  display: inline-block;
+  width: 23px;
+}
+
 #posiciones .primero {
   background-color: #FFFFEB !important;
 }
