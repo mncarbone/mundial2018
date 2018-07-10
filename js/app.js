@@ -235,10 +235,12 @@ app = {
     return unPartido.awayTeamName;
   },
   getGolesLocal: function (unPartido) {
-    return (unPartido.result.goalsHomeTeam === null)? '-' : unPartido.result.goalsHomeTeam;
+    return (unPartido.result.goalsHomeTeam === null)? '-' : (
+      (unPartido.result.extraTime)?  unPartido.result.extraTime.goalsHomeTeam : unPartido.result.goalsHomeTeam);
   },
   getGolesVisitante: function (unPartido) {
-    return (unPartido.result.goalsAwayTeam === null)? '-' : unPartido.result.goalsAwayTeam;
+    return (unPartido.result.goalsAwayTeam === null)? '-' : (
+      (unPartido.result.extraTime)? unPartido.result.extraTime.goalsAwayTeam : unPartido.result.goalsAwayTeam);
   },
   getEstado: function(unPartido){
     return (unPartido.status == 'FINISHED')? 'FINALIZADO' : ((unPartido.status == 'IN_PLAY')? 'INICIADO' : 'PENDIENTE');
@@ -255,12 +257,16 @@ app.actualizarDatos = function(){
   app.actualizarGrupos(function() {
     app.actualizarPartidos(function() {
       app.actualizarPosiciones(function() {
-          app.mostrarPartidos();
-          app.mostrarGrupos();
-          app.mostrarPosiciones();
+        app.actualizarUi()
       });
     });
   });
+}
+
+app.actualizarUi = function(){
+  app.mostrarPartidos();
+  app.mostrarGrupos();
+  app.mostrarPosiciones();
 }
 
 app.actualizarPartidos = function (alCargar){
