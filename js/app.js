@@ -8,7 +8,8 @@ $.fn.template = function(data) {
 }
 
 app = {
-  URL_PARTIDOS: 'http://api.football-data.org/v1/competitions/467/fixtures',
+  URL_PARTIDOS: 'https://jsonblob.com/api/jsonBlob/56d529cf-500c-11e8-91fd-9bf4817e5e9d',
+  URL_PARTIDOS_ORIGINAL: 'http://api.football-data.org/v1/competitions/467/fixtures',
   URL_PARTIDOS_ALT: 'https://jsonblob.com/api/jsonBlob/56d529cf-500c-11e8-91fd-9bf4817e5e9d',
   URL_GRUPOS: 'http://api.football-data.org/v1/competitions/467/leagueTable',
   URL_GRUPOS_ALT: 'https://jsonblob.com/api/jsonBlob/28cefd39-5011-11e8-91fd-cdcf5cb3d77a',
@@ -276,8 +277,15 @@ app.actualizarPartidos = function (alCargar){
     dataType: 'json',
     type: 'GET',
   }).done(function(response) {
-      app.cargarDatosPartidos(response);
-      alCargar();
+      if(response.no_cargar){
+        app.URL_PARTIDOS = app.URL_PARTIDOS_ORIGINAL;
+        app.actualizarPartidos(alCargar)
+        app.URL_PARTIDOS = app.URL_PARTIDOS_ALT;
+      }
+      else {
+          app.cargarDatosPartidos(response);
+          alCargar();
+      }
   });
 }
 
