@@ -8,10 +8,10 @@ $.fn.template = function(data) {
 }
 
 app = {
-  URL_PARTIDOS: 'https://jsonblob.com/api/jsonBlob/56d529cf-500c-11e8-91fd-9bf4817e5e9d',
-  URL_PARTIDOS_ORIGINAL: 'http://api.football-data.org/v1/competitions/467/fixtures',
+  URL_PARTIDOS: 'http://api.football-data.org/v2/competitions/2000/matches',
+  URL_PARTIDOS_ORIGINAL: 'http://api.football-data.org/v2/competitions/2000/matches',
   URL_PARTIDOS_ALT: 'https://jsonblob.com/api/jsonBlob/56d529cf-500c-11e8-91fd-9bf4817e5e9d',
-  URL_GRUPOS: 'http://api.football-data.org/v1/competitions/467/leagueTable',
+  URL_GRUPOS: 'http://api.football-data.org/v2/competitions/2000/standings',
   URL_GRUPOS_ALT: 'https://jsonblob.com/api/jsonBlob/28cefd39-5011-11e8-91fd-cdcf5cb3d77a',
   URL_APUESTAS: 'https://jsonblob.com/api/jsonBlob/1be165fb-6e77-11e8-b3c1-d94a81719b43',
   API_HEADER: 'X-Auth-Token',
@@ -205,10 +205,15 @@ app = {
     return headers;
   },
   getPartidos: function (response) {
-    return response.fixtures;
+    return response.matches;
   },
   getGrupos: function (response) {
-    return response.standings;
+    let posiciones = response.standings.filter(g => g.type == 'TOTAL');
+    let grupos = {};
+    posiciones.forEach(p=>{
+      grupos[p.group.substr(-1)] = p.table;
+    });
+    return grupos;
   },
   getUsuarios: function (response) {
     return response.usuarios;
@@ -217,7 +222,7 @@ app = {
     return (datosApuesta.id_partido == 33)? 33 : ((datosApuesta.id_partido == 34)? 32 : datosApuesta.id_partido - 1);
   },
   getFecha: function (unPartido) {
-    return unPartido.date;
+    return unPartido.utcDate;
   },
   getDia: function (unPartido) {
     var date = new Date(this.getFecha(unPartido));
@@ -230,18 +235,18 @@ app = {
     return ('0' + date.getHours()).slice(-2)+ ':' +('0' + date.getMinutes()).slice(-2);
   },
   getLocal: function (unPartido) {
-    return unPartido.homeTeamName;
+    return unPartido.homeTeam.name;
   },
   getVisitante: function (unPartido) {
-    return unPartido.awayTeamName;
+    return unPartido.awayTeam.name;
   },
   getGolesLocal: function (unPartido) {
-    return (unPartido.result.goalsHomeTeam === null)? '-' : (
-      (unPartido.result.extraTime)?  unPartido.result.extraTime.goalsHomeTeam : unPartido.result.goalsHomeTeam);
+    return (unPartido.score.fullTime.homeTeam === null)? '-' : (
+      (unPartido.score.extraTime.homeTeam === null)? unPartido.score.fullTime.homeTeam : unPartido.score.extraTime.homeTeam);
   },
   getGolesVisitante: function (unPartido) {
-    return (unPartido.result.goalsAwayTeam === null)? '-' : (
-      (unPartido.result.extraTime)? unPartido.result.extraTime.goalsAwayTeam : unPartido.result.goalsAwayTeam);
+    return (unPartido.score.fullTime.awayTeam === null)? '-' : (
+      (unPartido.score.extraTime.awayTeam === null)? unPartido.score.fullTime.awayTeam : unPartido.score.extraTime.awayTeam);
   },
   getEstado: function(unPartido){
     return (unPartido.status == 'FINISHED')? 'FINALIZADO' : ((unPartido.status == 'IN_PLAY')? 'INICIADO' : 'PENDIENTE');
@@ -250,16 +255,16 @@ app = {
     return (nombre)? this.map.flag[nombre.toUpperCase()] : '';
   },
   getCodigo: function(nombre){
-    return (nombre && nombre != 'TBD')? app.map.code[this.getBandera(nombre)] : '???';
+    return (nombre && nombre != 'TBD')? app.map.code[this.getBandera(nombre)] : nombre;
   }
 }
 
 app.actualizarDatos = function(){
   app.actualizarGrupos(function() {
     app.actualizarPartidos(function() {
-      app.actualizarPosiciones(function() {
+      //app.actualizarPosiciones(function() {
         app.actualizarUi()
-      });
+      //});
     });
   });
 }
@@ -277,7 +282,7 @@ app.actualizarPartidos = function (alCargar){
     dataType: 'json',
     type: 'GET',
   }).done(function(response) {
-      if(response.no_cargar){
+      if(false && response.no_cargar){
         app.URL_PARTIDOS = app.URL_PARTIDOS_ORIGINAL;
         app.actualizarPartidos(alCargar)
         app.URL_PARTIDOS = app.URL_PARTIDOS_ALT;

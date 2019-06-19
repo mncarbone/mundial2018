@@ -256,12 +256,12 @@ Partido.prototype.getGolesVisitante = function(){
 }
 
 function Equipo(datosEquipo){
-  this.nombre = datosEquipo.team;
+  this.nombre = datosEquipo.team.name;
   this.codigo = app.getCodigo(this.nombre)
   this.bandera = app.getBandera(this.nombre);
   this.puntos = datosEquipo.points;
   this.partidosJugados = datosEquipo.playedGames;
-  this.golesAFavor = datosEquipo.goals;
+  this.golesAFavor = datosEquipo.goalsFor;
   this.golesEnContra = datosEquipo.goalsAgainst;
   this.diferenciaDeGol = datosEquipo.goalDifference;
 }
